@@ -39,6 +39,7 @@ RUN apt-get update && \
 COPY pyproject.toml uv.lock ./
 COPY src/ ./src/
 COPY schema.json ./
+COPY README.md ./
 
 # Install RenderCV with all dependencies
 RUN pip install --no-cache-dir -e ".[full]"
