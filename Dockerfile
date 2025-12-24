@@ -12,6 +12,9 @@ RUN npm ci
 # Copy Next.js source
 COPY cv-tailor-app/ ./
 
+# Ensure public directory exists (create if empty)
+RUN mkdir -p public
+
 # Build Next.js app
 RUN npm run build
 
