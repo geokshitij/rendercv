@@ -69,6 +69,9 @@ Instructions:
 4. Adjust highlights in experience entries to better match job requirements
 5. Keep the YAML structure intact
 6. Return ONLY the modified YAML, no explanations
+7. Do not use adjectives like "proven", "expert", "skilled", "enthusiastic", etc. just use the facts and data.
+8. Do not use any emojis.
+9. Do not use very long sentences and keep it concise and to the point without any fillers like "specifically", "particularly", "greatly", etc. Use active voice and use I. 
 
 Return the tailored CV in YAML format:"""
 
@@ -87,6 +90,8 @@ Instructions:
 4. Keep the professional tone
 5. Maintain the YAML structure with the sections field
 6. Return ONLY the modified YAML, no explanations
+7. Do not use adjectives like "proven", "expert", "skilled", "enthusiastic", etc. just use the facts and data.
+8. Do not use any emojis.
 
 Return the tailored cover letter in YAML format:"""
         

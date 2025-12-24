@@ -98,13 +98,10 @@ Instructions:
 
 Return the tailored cover letter in YAML format:`
 
-    // Get tailored documents from Gemini
-    const [cvResult, coverLetterResult] = await Promise.all([
-      model.generateContent(cvPrompt),
-      model.generateContent(coverLetterPrompt),
-    ])
-
-    // Parse responses
+    // Generate CV first
+    const cvResult = await model.generateContent(cvPrompt)
+    
+    // Parse CV response
     let cvText = cvResult.response.text().trim()
     if (cvText.includes('```yaml')) {
       cvText = cvText.split('```yaml')[1].split('```')[0].trim()
@@ -112,6 +109,45 @@ Return the tailored cover letter in YAML format:`
       cvText = cvText.split('```')[1].split('```')[0].trim()
     }
 
+    // Parse the tailored CV to extract key information
+    let tailoredCvYaml: any
+    try {
+      tailoredCvYaml = yaml.load(cvText)
+    } catch (e) {
+      // If parsing fails, use the text as-is
+      tailoredCvYaml = cvText
+    }
+
+    // Update cover letter prompt to include the tailored CV
+    const coverLetterPromptWithCv = `You are a professional cover letter writer. Given the following job advertisement, the candidate's base cover letter template, and their TAILORED CV (already customized for this job), write a tailored cover letter that references specific details from the tailored CV.
+
+Job Advertisement:
+${jobAd}
+
+TAILORED CV (already customized for this job - use this to reference specific experiences and skills):
+${yaml.dump(tailoredCvYaml, { indent: 2 })}
+
+Base Cover Letter Template (YAML format):
+${yaml.dump(coverLetterYaml, { indent: 2 })}
+
+Instructions:
+1. Extract the position title, company name, and key requirements from the job ad
+2. Replace all placeholders like [Date], [Recipient Name], [Company Name], [Position Title], etc. with appropriate values
+3. Reference specific experiences, skills, or achievements from the TAILORED CV above to make the cover letter more compelling
+4. Ensure the cover letter aligns with what's highlighted in the tailored CV
+5. Write compelling paragraphs that connect the candidate's experience (from the tailored CV) to the job requirements
+6. Keep the professional tone
+7. Maintain the YAML structure with the sections field
+8. Return ONLY the modified YAML, no explanations
+9. Do not use adjectives like "proven", "expert", "skilled", "enthusiastic", etc. just use the facts and data.
+10. Do not use any emojis.
+
+Return the tailored cover letter in YAML format:`
+
+    // Generate cover letter using the tailored CV
+    const coverLetterResult = await model.generateContent(coverLetterPromptWithCv)
+
+    // Parse cover letter response
     let coverLetterText = coverLetterResult.response.text().trim()
     if (coverLetterText.includes('```yaml')) {
       coverLetterText = coverLetterText.split('```yaml')[1].split('```')[0].trim()
