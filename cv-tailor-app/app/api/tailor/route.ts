@@ -74,7 +74,7 @@ Instructions:
 6. Return ONLY the modified YAML, no explanations
 7. Do not use adjectives like "proven", "expert", "skilled", "enthusiastic", etc. just use the facts and data.
 8. Do not use any emojis.
-9. Do not use very long sentences and keep it concise and to the point without any fillers like "specifically", "particularly", "greatly", etc. Use active voice and use I. 
+9. Do not use very long sentences and keep it concise and to the point without any fillers like "specifically", "particularly", "greatly", etc.
 
 Return the tailored CV in YAML format:`
 
@@ -95,6 +95,7 @@ Instructions:
 6. Return ONLY the modified YAML, no explanations
 7. Do not use adjectives like "proven", "expert", "skilled", "enthusiastic", etc. just use the facts and data.
 8. Do not use any emojis.
+9. Use active voice and use I.
 
 Return the tailored cover letter in YAML format:`
 
