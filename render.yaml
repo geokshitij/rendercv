@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: cv-tailor-app
+    dockerfilePath: ./cv-tailor-app/Dockerfile
+    dockerContext: .
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: NODE_ENV
+        value: production
+    healthCheckPath: /
+    plan: starter  # Free tier, upgrade to standard/pro for better performance
+

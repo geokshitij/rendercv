@@ -1,0 +1,11 @@
+{
+  "functions": {
+    "app/api/tailor/route.ts": {
+      "maxDuration": 300
+    }
+  },
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "framework": "nextjs"
+}
+

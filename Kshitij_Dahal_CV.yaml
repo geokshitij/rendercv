@@ -1,0 +1,109 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/rendercv/rendercv/refs/tags/v2.6/schema.json
+cv:
+  name: Kshitij Dahal
+  location: Tempe, AZ
+  email: kdahal3@asu.edu
+  phone: '+14809196738'
+  social_networks:
+    - network: LinkedIn
+      username: geokshitij
+  custom_connections:
+    - placeholder: Google Scholar
+      url: https://scholar.google.com/citations?user=jOtnPBIAAAAJ&hl=en&oi=ao
+      fontawesome_icon: graduation-cap
+  sections:
+    summary:
+      - Civil/Environmental Engineer specializing in hydrology, geohazards, and sustainable infrastructure. Proven leadership through fellowships (AGU, CDRI, CIROH) and 15+ peer-reviewed publications (365+ citations, H-index 10). Experienced in hydrologic & hydrodynamic modeling, geospatial analytics, and AI/ML for water/environmental systems. Plan to pursue EIT and PE.
+    education:
+      - institution: Arizona State University
+        area: Civil, Environmental & Sustainable Engineering
+        degree: Ph.D.
+        start_date: 2023-01
+        end_date: 2026-05
+        location: Tempe, AZ
+        highlights:
+          - 'Advisor: Dr. Saurav Kumar'
+          - 'Courses: Hydrology, AI/ML, Remote Sensing, Water Quality'
+          - 'Dissertation: Improving streamflow forecasting in Arizona and CONUS'
+      - institution: Arizona State University
+        area: Civil, Environmental & Sustainable Engineering
+        degree: M.S.
+        start_date: 2023-08
+        end_date: 2025-08
+        location: Tempe, AZ
+        highlights:
+          - 'Advisor: Dr. Saurav Kumar'
+          - 'Courses: Hydrology, AI/ML, Remote Sensing, Water Quality'
+      - institution: Tribhuvan University
+        area: Civil Engineering
+        degree: B.Eng.
+        start_date: 2015-11
+        end_date: 2020-01
+        location: Bhaktapur, Nepal
+        highlights:
+          - 'Courses: Hydrology, Wastewater treatment, Structure, Soil Mechanics, GIS, Transportation'
+          - 'Project: Prefeasibility and hydrologic & structural design of Dordi river hydropower project'
+    experience:
+      - company: Arizona State University
+        position: Graduate Research/Teaching Associate
+        start_date: 2022-12
+        end_date: present
+        location: Tempe, AZ
+        highlights:
+          - Developed ML methods improving streamflow forecasts by 15% in Arizona
+          - Published and presented work at AGU, CMWR, and ASU Flow conferences
+          - Mentored students and assisted instruction in Numerical Methods and Fluid Mechanics
+      - company: Himalayan Risk Research Institute
+        position: Researcher
+        start_date: 2019-03
+        end_date: 2022-12
+        location: Nepal
+        summary:
+        highlights:
+          - Led hazard mapping, flood & landslide risk analysis using GIS & remote sensing
+          - Co-authored multiple journal papers on disaster risk and sustainable land use
+      - company: Khwopa College of Engineering, Tribhuvan University
+        position: Lecturer
+        start_date: 2019-11
+        end_date: 2021-10
+        location: Nepal
+        summary:
+        highlights:
+          - Taught Hydrology, Surveying, and GIS & Remote Sensing
+          - Supervised undergraduates
+    selected_honors:
+      - bullet: Community Science Fellow, AGU (2024–2026)
+      - bullet: HydroLearn Fellow, NOAA & University of Alabama (2024, $2.5K)
+      - bullet: CDRI Fellow ($10K, 2021)
+      - bullet: Outstanding Reviewer, Earth's Future, AGU (2025, top ~1%)
+      - bullet: Outstanding Poster, ASU Flow (2024)
+      - bullet: Water Quality Tiny Grant, AGU (2023)
+      - bullet: Best Graphical Abstract, AGU (2023)
+      - bullet: Hackathon Winner (1st), SpaceHack for Sustainability, ASU (2023)
+      - bullet: Hackathon Winner (1st), NOAA AI Workshop (2021)
+      - bullet: Travel Grants – CIROH DevCon (2024–2025), AGU Chapman (2024), DRI Conf. (2022)
+      - bullet: Full Scholarship – CUAHSI Snow Field School (2025)
+      - bullet: University Graduate Fellow ×3 ($3.1K), ASU (2023–2025)
+    skills:
+      - label: Civil/Hydrology
+        details: AutoCAD Civil 3D, HEC-RAS, HEC-HMS, MODFLOW, r.avaflow
+      - label: Geospatial/Remote Sensing
+        details: Google Earth Engine, ArcGIS Pro, QGIS, Grass GIS, PostGIS
+      - label: Programming/Data Science
+        details: Python, R, Git, HPC, Google Cloud, Tensorflow/PyTorch, Docker
+    other_information:
+      - bullet: '**Leadership:** Editorial Board, Regional Environmental Change (2024–Present); Executive Committee, YESS Community (2025–2026); Reviewer for 10+ international journals'
+      - bullet: '**Certifications & Memberships:** AGU, ASCE, Licensed ''A'' Civil Engineer (Nepal)'
+      - bullet: '**Languages:** English (Professional), Nepali (Fluent), Hindi (Fluent), Mandarin (Basic)'
+design:
+  theme: classic
+  sections:
+    allow_page_break: true
+  entries:
+    allow_page_break: true
+locale:
+  language: english
+settings:
+  current_date: '2025-12-24'
+  bold_keywords: []
+

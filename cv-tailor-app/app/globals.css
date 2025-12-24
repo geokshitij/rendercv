@@ -1,0 +1,126 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  font-family: 'Times New Roman', Times, serif;
+  background: #ffffff;
+  color: #000000;
+}
+
+body {
+  min-height: 100vh;
+  padding: 2rem;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: white;
+  padding: 2rem;
+}
+
+h1 {
+  color: #000000;
+  margin-bottom: 1rem;
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+h2 {
+  color: #000000;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+p {
+  margin-bottom: 1rem;
+}
+
+textarea {
+  width: 100%;
+  min-height: 200px;
+  padding: 0.5rem;
+  border: 1px solid #000000;
+  font-size: 1rem;
+  font-family: 'Times New Roman', Times, serif;
+  resize: vertical;
+  background: #ffffff;
+  color: #000000;
+}
+
+textarea:focus {
+  outline: 1px solid #000000;
+}
+
+button {
+  background: #000000;
+  color: white;
+  border: 1px solid #000000;
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  font-family: 'Times New Roman', Times, serif;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+button:hover:not(:disabled) {
+  background: #333333;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.loading {
+  text-align: center;
+  padding: 1rem;
+  color: #000000;
+}
+
+.error {
+  background: #ffffff;
+  color: #000000;
+  border: 1px solid #000000;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.success {
+  background: #ffffff;
+  color: #000000;
+  border: 1px solid #000000;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.download-links {
+  display: block;
+  margin-top: 1rem;
+}
+
+.download-link {
+  display: inline-block;
+  background: #000000;
+  color: white;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  border: 1px solid #000000;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-family: 'Times New Roman', Times, serif;
+}
+
+.download-link:hover {
+  background: #333333;
+}
+
