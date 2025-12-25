@@ -165,6 +165,31 @@ Return the tailored cover letter in YAML format:`
     const cvOutputPath = path.join(tmpDir, 'tailored_cv.yaml')
     const coverLetterOutputPath = path.join(tmpDir, 'tailored_cover_letter.yaml')
 
+    // Validate YAML before writing
+    try {
+      yaml.load(cvText)
+    } catch (yamlError: any) {
+      return NextResponse.json(
+        { 
+          error: `Invalid YAML in tailored CV: ${yamlError.message}`,
+          debug: { cvText: cvText.substring(0, 500) } // First 500 chars for debugging
+        },
+        { status: 500 }
+      )
+    }
+    
+    try {
+      yaml.load(coverLetterText)
+    } catch (yamlError: any) {
+      return NextResponse.json(
+        { 
+          error: `Invalid YAML in tailored cover letter: ${yamlError.message}`,
+          debug: { coverLetterText: coverLetterText.substring(0, 500) }
+        },
+        { status: 500 }
+      )
+    }
+
     fs.writeFileSync(cvOutputPath, cvText)
     fs.writeFileSync(coverLetterOutputPath, coverLetterText)
 
@@ -182,7 +207,11 @@ Return the tailored cover letter in YAML format:`
     let rendercvCommand = 'rendercv'
     
     // Render CV
+    let cvRenderSuccess = false
     let cvRenderError: any = null
+    let cvRenderOutput = ''
+    let cvRenderStderr = ''
+    
     try {
       const cvCommand = `cd ${tmpDir} && ${rendercvCommand} render "${cvOutputPath}"`
       const result = await execAsync(cvCommand, { 
@@ -191,12 +220,16 @@ Return the tailored cover letter in YAML format:`
         maxBuffer: 10 * 1024 * 1024, // 10MB buffer
       })
       console.log('CV render stdout:', result.stdout)
+      cvRenderOutput = result.stdout || ''
+      cvRenderStderr = result.stderr || ''
       if (result.stderr) {
         console.log('CV render stderr:', result.stderr)
       }
+      cvRenderSuccess = true
     } catch (error: any) {
       console.log('CV render error, trying Python module:', error.message)
-      console.log('CV render error stderr:', error.stderr)
+      cvRenderStderr = error.stderr || error.message || ''
+      console.log('CV render error stderr:', cvRenderStderr)
       cvRenderError = error
       // Fallback: try using python module directly
       try {
@@ -207,16 +240,20 @@ Return the tailored cover letter in YAML format:`
           maxBuffer: 10 * 1024 * 1024,
         })
         console.log('CV render (Python) stdout:', result.stdout)
+        cvRenderOutput = result.stdout || ''
+        cvRenderStderr = result.stderr || ''
         if (result.stderr) {
           console.log('CV render (Python) stderr:', result.stderr)
         }
+        cvRenderSuccess = true
         cvRenderError = null
       } catch (pythonError: any) {
         cvRenderError = pythonError
+        cvRenderStderr = pythonError.stderr || pythonError.message || ''
         if (pythonError.stderr) {
           console.log('CV render (Python) error stderr:', pythonError.stderr)
         }
-        throw new Error(`Failed to render CV: ${pythonError.message}${pythonError.stderr ? `. stderr: ${pythonError.stderr}` : ''}`)
+        // Don't throw yet - check if PDF was created anyway
       }
     }
 
@@ -256,10 +293,12 @@ Return the tailored cover letter in YAML format:`
     if (!fs.existsSync(rendercvOutputDir)) {
       // List all files in tmpDir for debugging
       const allFiles = fs.readdirSync(tmpDir, { recursive: true })
+      const errorMsg = `RenderCV output directory not found. CV rendering ${cvRenderSuccess ? 'succeeded' : 'failed'}.`
       return NextResponse.json(
         { 
-          error: `RenderCV output directory not found. Files in tmpDir: ${JSON.stringify(allFiles)}`,
-          debug: { tmpDir, rendercvOutputDir, allFiles }
+          error: errorMsg,
+          cvRenderError: cvRenderStderr || cvRenderError?.message,
+          debug: { tmpDir, rendercvOutputDir, allFiles, cvRenderOutput, cvRenderStderr }
         },
         { status: 500 }
       )
@@ -283,20 +322,43 @@ Return the tailored cover letter in YAML format:`
       return lower.includes('cover') || lower.includes('letter')
     })
 
-    if (!cvPdf || !coverLetterPdf) {
-      // If we found one but not the other, provide more helpful error
-      if (pdfFiles.length === 1 && coverLetterPdf && !cvPdf) {
-        return NextResponse.json(
-          { 
-            error: `CV PDF not found. Only found cover letter PDF: ${coverLetterPdf}. This suggests the CV rendering may have failed. Found PDFs: ${JSON.stringify(pdfFiles)}`,
-            debug: { rendercvOutputDir, pdfFiles, cvPdf, coverLetterPdf, allFiles: outputFiles }
-          },
-          { status: 500 }
-        )
+    // Check if CV PDF was generated
+    if (!cvPdf) {
+      // Check if there are any other files that might give us clues
+      const typFiles = outputFiles.filter(f => f.endsWith('.typ'))
+      const mdFiles = outputFiles.filter(f => f.endsWith('.md'))
+      const htmlFiles = outputFiles.filter(f => f.endsWith('.html'))
+      
+      const errorDetails: any = {
+        rendercvOutputDir,
+        pdfFiles,
+        typFiles,
+        mdFiles,
+        htmlFiles,
+        allFiles: outputFiles,
+        cvRenderSuccess,
+        cvRenderOutput,
+        cvRenderStderr
       }
+      
+      // If CV rendering failed, include the error
+      if (cvRenderError || !cvRenderSuccess) {
+        errorDetails.cvRenderError = cvRenderStderr || cvRenderError?.message || 'CV rendering failed'
+      }
+      
       return NextResponse.json(
         { 
-          error: `Failed to find generated PDFs. Found PDFs: ${JSON.stringify(pdfFiles)}`,
+          error: `CV PDF not found. Only found cover letter PDF: ${coverLetterPdf || 'none'}. This suggests the CV rendering failed. Found PDFs: ${JSON.stringify(pdfFiles)}`,
+          details: errorDetails
+        },
+        { status: 500 }
+      )
+    }
+    
+    if (!coverLetterPdf) {
+      return NextResponse.json(
+        { 
+          error: `Cover letter PDF not found. Found PDFs: ${JSON.stringify(pdfFiles)}`,
           debug: { rendercvOutputDir, pdfFiles, cvPdf, coverLetterPdf, allFiles: outputFiles }
         },
         { status: 500 }
