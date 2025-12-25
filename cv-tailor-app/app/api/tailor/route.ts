@@ -189,8 +189,12 @@ Return the tailored cover letter in YAML format:`
         maxBuffer: 10 * 1024 * 1024, // 10MB buffer
       })
       console.log('CV render stdout:', result.stdout)
+      if (result.stderr) {
+        console.log('CV render stderr:', result.stderr)
+      }
     } catch (error: any) {
       console.log('CV render error, trying Python module:', error.message)
+      console.log('CV render error stderr:', error.stderr)
       cvRenderError = error
       // Fallback: try using python module directly
       try {
@@ -201,10 +205,16 @@ Return the tailored cover letter in YAML format:`
           maxBuffer: 10 * 1024 * 1024,
         })
         console.log('CV render (Python) stdout:', result.stdout)
+        if (result.stderr) {
+          console.log('CV render (Python) stderr:', result.stderr)
+        }
         cvRenderError = null
       } catch (pythonError: any) {
         cvRenderError = pythonError
-        throw new Error(`Failed to render CV: ${pythonError.message}`)
+        if (pythonError.stderr) {
+          console.log('CV render (Python) error stderr:', pythonError.stderr)
+        }
+        throw new Error(`Failed to render CV: ${pythonError.message}${pythonError.stderr ? `. stderr: ${pythonError.stderr}` : ''}`)
       }
     }
 
@@ -260,21 +270,32 @@ Return the tailored cover letter in YAML format:`
     // Try to find CV and cover letter PDFs
     // CV might be named like "Kshitij_Dahal_CV.pdf" or similar
     // Cover letter might be named like "Kshitij_Dahal_Cover_Letter.pdf" or similar
-    const cvPdf = pdfFiles.find(f => 
-      (f.toLowerCase().includes('cv') && !f.toLowerCase().includes('cover')) ||
-      (f.toLowerCase().includes('kshitij') && !f.toLowerCase().includes('cover'))
-    )
+    // More flexible matching: CV should NOT contain "cover" or "letter"
+    const cvPdf = pdfFiles.find(f => {
+      const lower = f.toLowerCase()
+      return !lower.includes('cover') && !lower.includes('letter')
+    })
     
-    const coverLetterPdf = pdfFiles.find(f => 
-      f.toLowerCase().includes('cover') || 
-      f.toLowerCase().includes('letter')
-    )
+    const coverLetterPdf = pdfFiles.find(f => {
+      const lower = f.toLowerCase()
+      return lower.includes('cover') || lower.includes('letter')
+    })
 
     if (!cvPdf || !coverLetterPdf) {
+      // If we found one but not the other, provide more helpful error
+      if (pdfFiles.length === 1 && coverLetterPdf && !cvPdf) {
+        return NextResponse.json(
+          { 
+            error: `CV PDF not found. Only found cover letter PDF: ${coverLetterPdf}. This suggests the CV rendering may have failed. Found PDFs: ${JSON.stringify(pdfFiles)}`,
+            debug: { rendercvOutputDir, pdfFiles, cvPdf, coverLetterPdf, allFiles: outputFiles }
+          },
+          { status: 500 }
+        )
+      }
       return NextResponse.json(
         { 
           error: `Failed to find generated PDFs. Found PDFs: ${JSON.stringify(pdfFiles)}`,
-          debug: { rendercvOutputDir, pdfFiles, cvPdf, coverLetterPdf }
+          debug: { rendercvOutputDir, pdfFiles, cvPdf, coverLetterPdf, allFiles: outputFiles }
         },
         { status: 500 }
       )

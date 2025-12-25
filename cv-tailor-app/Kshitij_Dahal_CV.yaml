@@ -80,16 +80,19 @@ cv:
           - 'Produced flood depth and hazard maps validated against satellite imagery for multi-hazard risk assessment'
       - name: '#text(weight: "normal")[Foundational Model for Using Earth Observation Satellite Data for Hydrologic Science] [#link("https://github.com/geokshitij/Watershed-Foundation-Model")[#underline[#text(weight: "normal")[Link]]]]'
         start_date: 2024
+        end_date: 2025
         highlights:
           - 'Developed large-scale foundational model using Vision Transformers (ViT) across 100K+ basins in the U.S. for 3D GIS modeling'
           - 'Enhanced understanding of land-surface-hydrology relationships for civil engineering land development and stormwater planning'
       - name: '#text(weight: "normal")[Explainable AI for Groundwater Potential Mapping] [#link("https://www.sciencedirect.com/science/article/abs/pii/S0022169423013598")[#underline[#text(weight: "normal")[Link]]]]'
         start_date: 2023
+        end_date: 2024
         highlights:
           - 'Developed ML framework to identify groundwater potential zones in data-scarce, mountainous regions for water resource planning'
           - 'Implemented Explainable AI (SHAP) to interpret geospatial model predictions. Published in Journal of Hydrology'
       - name: '#text(weight: "normal")[Improving Streamflow Forecasting with Deep Learning and Bayesian Averaging] [#link("https://github.com/waterdmd/AI4flow")[#underline[#text(weight: "normal")[Link]]]]'
         start_date: 2023
+        end_date: 2024
         highlights:
           - 'Designed framework combining multiple deep learning models for operational streamflow forecasting'
           - 'Utilized Bayesian Model Averaging to quantify model uncertainty for reliable water resource management forecasts'
