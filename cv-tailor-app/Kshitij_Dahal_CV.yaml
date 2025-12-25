@@ -78,7 +78,7 @@ cv:
         highlights:
           - 'Modeled 2021 Melamchi cascading flood using HEC-HMS and HEC-RAS to simulate rainfall–runoff and downstream inundation patterns'
           - 'Produced flood depth and hazard maps validated against satellite imagery for multi-hazard risk assessment'
-      - name: 'Foundational Model for Using Earth Observation Satellite Data for Hydrologic Science [#underline[Link]](https://github.com/geokshitij/Watershed-Foundation-Model)'
+      - name: 'Foundational Model for Using Earth Observation Data for Hydrologic Science [#underline[Link]](https://github.com/geokshitij/Watershed-Foundation-Model)'
         start_date: 2024
         end_date: 2025
         highlights:
