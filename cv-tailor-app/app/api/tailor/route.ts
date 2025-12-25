@@ -143,7 +143,8 @@ Instructions:
 8. Return ONLY the modified YAML, no explanations
 9. Do not use adjectives like "proven", "expert", "skilled", "enthusiastic", etc. just use the facts and data.
 10. Do not use any emojis.
-11. Bold 4-5 relevant words maximum using **text** Markdown syntax. Choose the most important keywords or phrases that align with the job requirements.
+11. Bold 5-6 relevant words maximum using **text** Markdown syntax. Choose the most important keywords or phrases that align with the job requirements.
+12. Do not repeat the same information from the tailored CV.
 
 Return the tailored cover letter in YAML format:`
 
