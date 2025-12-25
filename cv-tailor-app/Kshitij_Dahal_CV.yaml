@@ -22,7 +22,6 @@ cv:
         end_date: 2026-05
         location: Tempe, AZ
         highlights:
-          - 'Advisor: Dr. Saurav Kumar'
           - 'Courses: AI/ML, Remote Sensing, Water Quality, Science Communication'
           - 'Dissertation: Improving streamflow forecasting in Arizona and CONUS'
       - institution: Arizona State University
@@ -41,7 +40,7 @@ cv:
         location: Bhaktapur, Nepal
         highlights:
           - 'Courses: Hydrology, Wastewater treatment, Structure, Soil Mechanics, GIS, Transportation'
-          - 'Project: Prefeasibility and hydrologic & structural design of Dordi river hydropower project'
+          - 'Project: Hydrological & structural design of Dordi river hydropower project in Nepal'
     experience:
       - company: Arizona State University
         position: Graduate Research/Teaching Associate
@@ -94,8 +93,7 @@ cv:
         start_date: 2023
         end_date: 2024
         highlights:
-          - 'Designed framework combining multiple deep learning models for operational streamflow forecasting'
-          - 'Utilized Bayesian Model Averaging to quantify model uncertainty for reliable water resource management forecasts'
+          - 'Developed framework combining multiple deep learning methods for operational streamflow forecasting in Arizona'
     selected_honors:
       - bullet: Community Science Fellow, AGU (2024–2026)
       - bullet: HydroLearn Fellow, NOAA & University of Alabama (2024, $2.5K)
