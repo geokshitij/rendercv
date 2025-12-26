@@ -177,6 +177,7 @@ Return the tailored cover letter in YAML format:`
     // Programmatically set dates (don't trust AI)
     const todayDate = getTodayDateString()
     const formattedDate = getFormattedDateForCoverLetter()
+    console.log('Setting current_date to:', todayDate)
     
     // Update CV YAML to set current_date
     try {
@@ -185,8 +186,10 @@ Return the tailored cover letter in YAML format:`
         if (!cvYamlParsed.settings) {
           cvYamlParsed.settings = {}
         }
+        // Always overwrite current_date with today's date
         cvYamlParsed.settings.current_date = todayDate
         cvText = yaml.dump(cvYamlParsed, { indent: 2 })
+        console.log('CV date updated successfully')
       }
     } catch (e) {
       // If parsing fails, continue with original text
@@ -197,7 +200,7 @@ Return the tailored cover letter in YAML format:`
     try {
       const coverLetterYamlParsed = yaml.load(coverLetterText) as any
       if (coverLetterYamlParsed && typeof coverLetterYamlParsed === 'object') {
-        // Set current_date
+        // Set current_date - always overwrite with today's date
         if (!coverLetterYamlParsed.settings) {
           coverLetterYamlParsed.settings = {}
         }
@@ -216,6 +219,7 @@ Return the tailored cover letter in YAML format:`
         }
         
         coverLetterText = yaml.dump(coverLetterYamlParsed, { indent: 2 })
+        console.log('Cover letter date updated successfully, formatted date:', formattedDate)
       }
     } catch (e) {
       // If parsing fails, continue with original text

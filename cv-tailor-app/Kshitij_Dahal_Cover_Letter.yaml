@@ -47,7 +47,6 @@ design:
 locale:
   language: english
 settings:
-  current_date: '2025-12-24'
   render_command:
     pdf_path: rendercv_output/Kshitij_Dahal_Cover_Letter.pdf
     typst_path: rendercv_output/Kshitij_Dahal_Cover_Letter.typ
