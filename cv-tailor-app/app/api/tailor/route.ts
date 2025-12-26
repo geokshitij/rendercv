@@ -180,7 +180,7 @@ Return the tailored cover letter in YAML format:`
     
     // Update CV YAML to set current_date
     try {
-      const cvYamlParsed = yaml.load(cvText)
+      const cvYamlParsed = yaml.load(cvText) as any
       if (cvYamlParsed && typeof cvYamlParsed === 'object') {
         if (!cvYamlParsed.settings) {
           cvYamlParsed.settings = {}
@@ -195,7 +195,7 @@ Return the tailored cover letter in YAML format:`
     
     // Update cover letter YAML to set current_date and replace [Date] placeholder
     try {
-      const coverLetterYamlParsed = yaml.load(coverLetterText)
+      const coverLetterYamlParsed = yaml.load(coverLetterText) as any
       if (coverLetterYamlParsed && typeof coverLetterYamlParsed === 'object') {
         // Set current_date
         if (!coverLetterYamlParsed.settings) {
