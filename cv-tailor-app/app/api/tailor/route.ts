@@ -9,6 +9,21 @@ import archiver from 'archiver'
 
 const execAsync = promisify(exec)
 
+function getTodayDateString(): string {
+  const today = new Date()
+  const year = today.getFullYear()
+  const month = String(today.getMonth() + 1).padStart(2, '0')
+  const day = String(today.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+function getFormattedDateForCoverLetter(): string {
+  const today = new Date()
+  const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                  'July', 'August', 'September', 'October', 'November', 'December']
+  return `${months[today.getMonth()]} ${today.getDate()}, ${today.getFullYear()}`
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { jobAd } = await request.json()
@@ -157,6 +172,54 @@ Return the tailored cover letter in YAML format:`
       coverLetterText = coverLetterText.split('```yaml')[1].split('```')[0].trim()
     } else if (coverLetterText.includes('```')) {
       coverLetterText = coverLetterText.split('```')[1].split('```')[0].trim()
+    }
+
+    // Programmatically set dates (don't trust AI)
+    const todayDate = getTodayDateString()
+    const formattedDate = getFormattedDateForCoverLetter()
+    
+    // Update CV YAML to set current_date
+    try {
+      const cvYamlParsed = yaml.load(cvText)
+      if (cvYamlParsed && typeof cvYamlParsed === 'object') {
+        if (!cvYamlParsed.settings) {
+          cvYamlParsed.settings = {}
+        }
+        cvYamlParsed.settings.current_date = todayDate
+        cvText = yaml.dump(cvYamlParsed, { indent: 2 })
+      }
+    } catch (e) {
+      // If parsing fails, continue with original text
+      console.log('Could not update CV date:', e)
+    }
+    
+    // Update cover letter YAML to set current_date and replace [Date] placeholder
+    try {
+      const coverLetterYamlParsed = yaml.load(coverLetterText)
+      if (coverLetterYamlParsed && typeof coverLetterYamlParsed === 'object') {
+        // Set current_date
+        if (!coverLetterYamlParsed.settings) {
+          coverLetterYamlParsed.settings = {}
+        }
+        coverLetterYamlParsed.settings.current_date = todayDate
+        
+        // Replace [Date] placeholder in content
+        if (coverLetterYamlParsed.cv?.sections?.['']) {
+          coverLetterYamlParsed.cv.sections[''] = coverLetterYamlParsed.cv.sections[''].map(
+            (line: string) => {
+              if (typeof line === 'string' && line.trim() === '[Date]') {
+                return formattedDate
+              }
+              return line
+            }
+          )
+        }
+        
+        coverLetterText = yaml.dump(coverLetterYamlParsed, { indent: 2 })
+      }
+    } catch (e) {
+      // If parsing fails, continue with original text
+      console.log('Could not update cover letter date:', e)
     }
 
     // Create temporary files
