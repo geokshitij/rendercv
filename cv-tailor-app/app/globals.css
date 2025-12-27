@@ -61,6 +61,28 @@ textarea:focus {
   outline: 1px solid #000000;
 }
 
+input[type="date"] {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #000000;
+  font-size: 1rem;
+  font-family: 'Times New Roman', Times, serif;
+  background: #ffffff;
+  color: #000000;
+  cursor: pointer;
+}
+
+input[type="date"]:focus {
+  outline: 1px solid #000000;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #000000;
+  font-weight: bold;
+}
+
 button {
   background: #000000;
   color: white;

@@ -17,16 +17,17 @@ function getTodayDateString(): string {
   return `${year}-${month}-${day}`
 }
 
-function getFormattedDateForCoverLetter(): string {
-  const today = new Date()
+function formatDateForCoverLetter(dateString: string): string {
+  // Parse the date string (YYYY-MM-DD format)
+  const date = new Date(dateString + 'T00:00:00') // Add time to avoid timezone issues
   const months = ['January', 'February', 'March', 'April', 'May', 'June', 
                   'July', 'August', 'September', 'October', 'November', 'December']
-  return `${months[today.getMonth()]} ${today.getDate()}, ${today.getFullYear()}`
+  return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const { jobAd } = await request.json()
+    const { jobAd, date } = await request.json()
 
     if (!jobAd) {
       return NextResponse.json(
@@ -103,15 +104,16 @@ ${yaml.dump(coverLetterYaml, { indent: 2 })}
 
 Instructions:
 1. Extract the position title, company name, and key requirements from the job ad
-2. Replace all placeholders like [Date], [Recipient Name], [Company Name], [Position Title], etc. with appropriate values
-3. Write compelling paragraphs that connect the candidate's experience to the job requirements
-4. Keep the professional tone
-5. Maintain the YAML structure with the sections field
-6. Return ONLY the modified YAML, no explanations
-7. Do not use adjectives like "proven", "expert", "skilled", "enthusiastic", etc. just use the facts and data.
-8. Do not use any emojis.
-9. Use active voice and use I.
-10. Bold 4-5 relevant words maximum using **text** Markdown syntax. Choose the most important keywords or phrases that align with the job requirements.
+2. Replace all placeholders like [Recipient Name], [Company Name], [Position Title], etc. with appropriate values
+3. IMPORTANT: Keep the [Date] placeholder as-is. Do NOT replace it with a date - it will be replaced programmatically.
+4. Write compelling paragraphs that connect the candidate's experience to the job requirements
+5. Keep the professional tone
+6. Maintain the YAML structure with the sections field
+7. Return ONLY the modified YAML, no explanations
+8. Do not use adjectives like "proven", "expert", "skilled", "enthusiastic", etc. just use the facts and data.
+9. Do not use any emojis.
+10. Use active voice and use I.
+11. Bold 4-5 relevant words maximum using **text** Markdown syntax. Choose the most important keywords or phrases that align with the job requirements.
 
 Return the tailored cover letter in YAML format:`
 
@@ -149,17 +151,18 @@ ${yaml.dump(coverLetterYaml, { indent: 2 })}
 
 Instructions:
 1. Extract the position title, company name, and key requirements from the job ad
-2. Replace all placeholders like [Date], [Recipient Name], [Company Name], [Position Title], etc. with appropriate values
-3. Reference specific experiences, skills, or achievements from the TAILORED CV above to make the cover letter more compelling
-4. Ensure the cover letter aligns with what's highlighted in the tailored CV
-5. Write compelling paragraphs that connect the candidate's experience (from the tailored CV) to the job requirements
-6. Keep the professional tone
-7. Maintain the YAML structure with the sections field
-8. Return ONLY the modified YAML, no explanations
-9. Do not use adjectives like "proven", "expert", "skilled", "enthusiastic", etc. just use the facts and data.
-10. Do not use any emojis.
-11. Bold 5-6 relevant words maximum using **text** Markdown syntax. Choose the most important keywords or phrases that align with the job requirements.
-12. Do not repeat the same information from the tailored CV.
+2. Replace all placeholders like [Recipient Name], [Company Name], [Position Title], etc. with appropriate values
+3. IMPORTANT: Keep the [Date] placeholder as-is. Do NOT replace it with a date - it will be replaced programmatically.
+4. Reference specific experiences, skills, or achievements from the TAILORED CV above to make the cover letter more compelling
+5. Ensure the cover letter aligns with what's highlighted in the tailored CV
+6. Write compelling paragraphs that connect the candidate's experience (from the tailored CV) to the job requirements
+7. Keep the professional tone
+8. Maintain the YAML structure with the sections field
+9. Return ONLY the modified YAML, no explanations
+10. Do not use adjectives like "proven", "expert", "skilled", "enthusiastic", etc. just use the facts and data.
+11. Do not use any emojis.
+12. Bold 5-6 relevant words maximum using **text** Markdown syntax. Choose the most important keywords or phrases that align with the job requirements.
+13. Do not repeat the same information from the tailored CV.
 
 Return the tailored cover letter in YAML format:`
 
@@ -174,10 +177,10 @@ Return the tailored cover letter in YAML format:`
       coverLetterText = coverLetterText.split('```')[1].split('```')[0].trim()
     }
 
-    // Programmatically set dates (don't trust AI)
-    const todayDate = getTodayDateString()
-    const formattedDate = getFormattedDateForCoverLetter()
-    console.log('Setting current_date to:', todayDate)
+    // Use the date provided by the user, or fall back to today's date
+    const selectedDate = date || getTodayDateString()
+    const formattedDate = formatDateForCoverLetter(selectedDate)
+    console.log('Setting current_date to:', selectedDate)
     
     // Update CV YAML to set current_date
     try {
@@ -186,8 +189,8 @@ Return the tailored cover letter in YAML format:`
         if (!cvYamlParsed.settings) {
           cvYamlParsed.settings = {}
         }
-        // Always overwrite current_date with today's date
-        cvYamlParsed.settings.current_date = todayDate
+        // Always overwrite current_date with the selected date
+        cvYamlParsed.settings.current_date = selectedDate
         cvText = yaml.dump(cvYamlParsed, { indent: 2 })
         console.log('CV date updated successfully')
       }
@@ -196,26 +199,72 @@ Return the tailored cover letter in YAML format:`
       console.log('Could not update CV date:', e)
     }
     
-    // Update cover letter YAML to set current_date and replace [Date] placeholder
+    // Update cover letter YAML to set current_date and replace [Date] placeholder or any existing date
     try {
       const coverLetterYamlParsed = yaml.load(coverLetterText) as any
       if (coverLetterYamlParsed && typeof coverLetterYamlParsed === 'object') {
-        // Set current_date - always overwrite with today's date
+        // Set current_date - always overwrite with the selected date
         if (!coverLetterYamlParsed.settings) {
           coverLetterYamlParsed.settings = {}
         }
-        coverLetterYamlParsed.settings.current_date = todayDate
+        coverLetterYamlParsed.settings.current_date = selectedDate
         
-        // Replace [Date] placeholder in content
+        // Replace [Date] placeholder or any date pattern in the first few lines
         if (coverLetterYamlParsed.cv?.sections?.['']) {
+          // Date patterns to match: "Month Day, Year", "Month Day Year", etc.
+          const datePatterns = [
+            /(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4}/gi,
+            /\d{1,2}\/\d{1,2}\/\d{4}/g,
+            /\d{4}-\d{2}-\d{2}/g,
+          ]
+          
+          let dateReplaced = false
           coverLetterYamlParsed.cv.sections[''] = coverLetterYamlParsed.cv.sections[''].map(
-            (line: string) => {
-              if (typeof line === 'string' && line.trim() === '[Date]') {
-                return formattedDate
+            (line: string, index: number) => {
+              if (typeof line === 'string') {
+                // First, check if it's the [Date] placeholder
+                if (line.trim() === '[Date]') {
+                  dateReplaced = true
+                  return formattedDate
+                }
+                
+                // If we haven't replaced the date yet and this is one of the first 5 lines, check for date patterns
+                if (!dateReplaced && index < 5) {
+                  // Check for full date line first (e.g., "November 18, 2024" or "Nov 18, 2024")
+                  const fullDateMatch = line.trim().match(/^(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4}$/i)
+                  if (fullDateMatch) {
+                    dateReplaced = true
+                    return formattedDate
+                  }
+                  
+                  // Check for date patterns within the line
+                  for (const pattern of datePatterns) {
+                    // Reset regex lastIndex to avoid issues with global regex
+                    pattern.lastIndex = 0
+                    if (pattern.test(line)) {
+                      dateReplaced = true
+                      // Replace date pattern in the line
+                      pattern.lastIndex = 0
+                      return line.replace(pattern, formattedDate)
+                    }
+                  }
+                }
               }
               return line
             }
           )
+          
+          // If we still haven't found a date in the first 5 lines, insert it at the beginning
+          if (!dateReplaced && coverLetterYamlParsed.cv.sections[''].length > 0) {
+            // Check if first line is empty or whitespace, if so replace it, otherwise insert
+            if (coverLetterYamlParsed.cv.sections[''][0] === '' || 
+                (typeof coverLetterYamlParsed.cv.sections[''][0] === 'string' && 
+                 coverLetterYamlParsed.cv.sections[''][0].trim() === '')) {
+              coverLetterYamlParsed.cv.sections[''][0] = formattedDate
+            } else {
+              coverLetterYamlParsed.cv.sections[''].unshift(formattedDate)
+            }
+          }
         }
         
         coverLetterText = yaml.dump(coverLetterYamlParsed, { indent: 2 })
@@ -326,7 +375,11 @@ Return the tailored cover letter in YAML format:`
     }
 
     // Render Cover Letter
+    let coverLetterRenderSuccess = false
     let coverLetterRenderError: any = null
+    let coverLetterRenderOutput = ''
+    let coverLetterRenderStderr = ''
+    
     try {
       const coverLetterCommand = `cd ${tmpDir} && ${rendercvCommand} render "${coverLetterOutputPath}"`
       const result = await execAsync(coverLetterCommand, { 
@@ -335,8 +388,15 @@ Return the tailored cover letter in YAML format:`
         maxBuffer: 10 * 1024 * 1024,
       })
       console.log('Cover letter render stdout:', result.stdout)
+      coverLetterRenderOutput = result.stdout || ''
+      coverLetterRenderStderr = result.stderr || ''
+      if (result.stderr) {
+        console.log('Cover letter render stderr:', result.stderr)
+      }
+      coverLetterRenderSuccess = true
     } catch (error: any) {
       console.log('Cover letter render error, trying Python module:', error.message)
+      coverLetterRenderStderr = error.stderr || error.message || ''
       coverLetterRenderError = error
       // Fallback: try using python module directly
       try {
@@ -347,26 +407,52 @@ Return the tailored cover letter in YAML format:`
           maxBuffer: 10 * 1024 * 1024,
         })
         console.log('Cover letter render (Python) stdout:', result.stdout)
+        coverLetterRenderOutput = result.stdout || ''
+        coverLetterRenderStderr = result.stderr || ''
+        if (result.stderr) {
+          console.log('Cover letter render (Python) stderr:', result.stderr)
+        }
+        coverLetterRenderSuccess = true
         coverLetterRenderError = null
       } catch (pythonError: any) {
         coverLetterRenderError = pythonError
-        throw new Error(`Failed to render cover letter: ${pythonError.message}`)
+        coverLetterRenderStderr = pythonError.stderr || pythonError.message || ''
+        console.log('Cover letter render (Python) error stderr:', coverLetterRenderStderr)
+        // Don't throw yet - check if PDF was created anyway
       }
+    }
+
+    // Helper function to extract name from YAML to find the correct PDF
+    const extractNameFromYaml = (yamlText: string): string | null => {
+      try {
+        const parsed = yaml.load(yamlText) as any
+        if (parsed?.cv?.name) {
+          // Convert name to filename format (replace spaces with underscores)
+          return parsed.cv.name.replace(/\s+/g, '_')
+        }
+      } catch (e) {
+        console.log('Could not extract name from YAML:', e)
+      }
+      return null
     }
 
     // RenderCV outputs to 'rendercv_output' directory relative to the YAML file location
     const rendercvOutputDir = path.join(tmpDir, 'rendercv_output')
     
+    // Wait a bit for files to be written (sometimes there's a small delay)
+    await new Promise(resolve => setTimeout(resolve, 500))
+    
     // Check if rendercv_output directory exists
     if (!fs.existsSync(rendercvOutputDir)) {
       // List all files in tmpDir for debugging
       const allFiles = fs.readdirSync(tmpDir, { recursive: true })
-      const errorMsg = `RenderCV output directory not found. CV rendering ${cvRenderSuccess ? 'succeeded' : 'failed'}.`
+      const errorMsg = `RenderCV output directory not found. CV rendering ${cvRenderSuccess ? 'succeeded' : 'failed'}, Cover letter rendering ${coverLetterRenderSuccess ? 'succeeded' : 'failed'}.`
       return NextResponse.json(
         { 
           error: errorMsg,
           cvRenderError: cvRenderStderr || cvRenderError?.message,
-          debug: { tmpDir, rendercvOutputDir, allFiles, cvRenderOutput, cvRenderStderr }
+          coverLetterRenderError: coverLetterRenderStderr || coverLetterRenderError?.message,
+          debug: { tmpDir, rendercvOutputDir, allFiles, cvRenderOutput, cvRenderStderr, coverLetterRenderOutput, coverLetterRenderStderr }
         },
         { status: 500 }
       )
@@ -376,19 +462,49 @@ Return the tailored cover letter in YAML format:`
     const outputFiles = fs.readdirSync(rendercvOutputDir)
     const pdfFiles = outputFiles.filter(f => f.endsWith('.pdf'))
     
-    // Try to find CV and cover letter PDFs
-    // CV might be named like "Kshitij_Dahal_CV.pdf" or similar
-    // Cover letter might be named like "Kshitij_Dahal_Cover_Letter.pdf" or similar
-    // More flexible matching: CV should NOT contain "cover" or "letter"
-    const cvPdf = pdfFiles.find(f => {
-      const lower = f.toLowerCase()
-      return !lower.includes('cover') && !lower.includes('letter')
-    })
+    console.log('Found PDF files:', pdfFiles)
+    console.log('All output files:', outputFiles)
     
-    const coverLetterPdf = pdfFiles.find(f => {
-      const lower = f.toLowerCase()
-      return lower.includes('cover') || lower.includes('letter')
-    })
+    // Try to extract names from YAML files to find the correct PDFs
+    const cvName = extractNameFromYaml(cvText)
+    const coverLetterName = extractNameFromYaml(coverLetterText)
+    
+    console.log('Extracted CV name:', cvName)
+    console.log('Extracted cover letter name:', coverLetterName)
+    
+    // Try to find CV and cover letter PDFs
+    // First try to match by extracted name, then fall back to pattern matching
+    let cvPdf = cvName 
+      ? pdfFiles.find(f => f.toLowerCase().includes(cvName.toLowerCase()) && !f.toLowerCase().includes('cover') && !f.toLowerCase().includes('letter'))
+      : null
+    
+    if (!cvPdf) {
+      // Fallback: CV should NOT contain "cover" or "letter"
+      cvPdf = pdfFiles.find(f => {
+        const lower = f.toLowerCase()
+        return !lower.includes('cover') && !lower.includes('letter')
+      })
+    }
+    
+    let coverLetterPdf = coverLetterName
+      ? pdfFiles.find(f => f.toLowerCase().includes(coverLetterName.toLowerCase()) && (f.toLowerCase().includes('cover') || f.toLowerCase().includes('letter')))
+      : null
+    
+    if (!coverLetterPdf) {
+      // Fallback: Cover letter should contain "cover" or "letter"
+      coverLetterPdf = pdfFiles.find(f => {
+        const lower = f.toLowerCase()
+        return lower.includes('cover') || lower.includes('letter')
+      })
+    }
+    
+    // If still not found, try to find by checking all PDFs and their patterns
+    if (!coverLetterPdf && pdfFiles.length > 0) {
+      // If we found CV but not cover letter, and there are multiple PDFs, the other one might be the cover letter
+      if (cvPdf && pdfFiles.length > 1) {
+        coverLetterPdf = pdfFiles.find(f => f !== cvPdf)
+      }
+    }
 
     // Check if CV PDF was generated
     if (!cvPdf) {
@@ -424,10 +540,38 @@ Return the tailored cover letter in YAML format:`
     }
     
     if (!coverLetterPdf) {
+      // Check if there are any other files that might give us clues
+      const typFiles = outputFiles.filter(f => f.endsWith('.typ'))
+      const mdFiles = outputFiles.filter(f => f.endsWith('.md'))
+      const htmlFiles = outputFiles.filter(f => f.endsWith('.html'))
+      
+      const errorDetails: any = {
+        rendercvOutputDir,
+        pdfFiles,
+        typFiles,
+        mdFiles,
+        htmlFiles,
+        allFiles: outputFiles,
+        cvRenderSuccess,
+        cvRenderOutput,
+        cvRenderStderr,
+        coverLetterRenderSuccess,
+        coverLetterRenderOutput,
+        coverLetterRenderStderr,
+        cvName,
+        coverLetterName,
+        cvPdf
+      }
+      
+      // If cover letter rendering failed, include the error
+      if (coverLetterRenderError || !coverLetterRenderSuccess) {
+        errorDetails.coverLetterRenderError = coverLetterRenderStderr || coverLetterRenderError?.message || 'Cover letter rendering failed'
+      }
+      
       return NextResponse.json(
         { 
-          error: `Cover letter PDF not found. Found PDFs: ${JSON.stringify(pdfFiles)}`,
-          debug: { rendercvOutputDir, pdfFiles, cvPdf, coverLetterPdf, allFiles: outputFiles }
+          error: `Cover letter PDF not found. Found PDFs: ${JSON.stringify(pdfFiles)}. CV PDF: ${cvPdf || 'none'}`,
+          debug: errorDetails
         },
         { status: 500 }
       )

@@ -13,7 +13,17 @@ function base64ToBlob(base64: string, mimeType: string): Blob {
 }
 
 export default function Home() {
+  // Get today's date in YYYY-MM-DD format for the date input
+  const getTodayDate = () => {
+    const today = new Date()
+    const year = today.getFullYear()
+    const month = String(today.getMonth() + 1).padStart(2, '0')
+    const day = String(today.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
+
   const [jobAd, setJobAd] = useState('')
+  const [date, setDate] = useState(getTodayDate())
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
@@ -35,7 +45,7 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ jobAd }),
+        body: JSON.stringify({ jobAd, date }),
       })
 
       if (!response.ok) {
@@ -83,6 +93,29 @@ export default function Home() {
           placeholder="Paste the job advertisement here..."
           required
         />
+
+        <div style={{ marginTop: '1.5rem', marginBottom: '1rem' }}>
+          <label htmlFor="date-input" style={{ display: 'block', marginBottom: '0.5rem', color: '#000000', fontWeight: 'bold' }}>
+            Date (for cover letter):
+          </label>
+          <input
+            id="date-input"
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            required
+            style={{
+              width: '100%',
+              padding: '0.5rem',
+              border: '1px solid #000000',
+              fontSize: '1rem',
+              fontFamily: "'Times New Roman', Times, serif",
+              background: '#ffffff',
+              color: '#000000',
+              cursor: 'pointer'
+            }}
+          />
+        </div>
 
         <button type="submit" disabled={loading || !jobAd.trim()}>
           {loading ? 'Tailoring your documents...' : 'Tailor Resume & Cover Letter'}
